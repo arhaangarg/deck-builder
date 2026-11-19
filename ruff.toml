@@ -1,0 +1,6 @@
+src = ["scripts"]
+line-length = 180
+
+[lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM"]
+ignore = ["SIM108"]  # a nested ternary is harder to read than the if/else it replaces

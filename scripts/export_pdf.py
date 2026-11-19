@@ -2,10 +2,10 @@
 import argparse
 from pathlib import Path
 
+import pymupdf
 from playwright.sync_api import sync_playwright
 
 PAGE_WIDTH_IN = 13.333
-
 
 
 def main():
@@ -19,7 +19,6 @@ def main():
         browser = p.chromium.launch()
         page = browser.new_page()
         pages = []
-        import pymupdf
         merged = pymupdf.open()
         for path in args.html:
             page.goto(Path(path).resolve().as_uri())

@@ -45,7 +45,7 @@ def main():
         out = Path(args.thumbnails)
         out.mkdir(parents=True, exist_ok=True)
         slide_ids = [slide_id for slide_id, _ in load_specs(args.specs)]
-        for slide_id, page_id in zip(slide_ids, google.page_ids(file_id)):
+        for slide_id, page_id in zip(slide_ids, google.page_ids(file_id), strict=True):
             download(google.thumbnail_url(file_id, page_id), out / f"{slide_id}.png")
 
     # Recorded last: reading thumbnails must not look like someone's edit on the next build.

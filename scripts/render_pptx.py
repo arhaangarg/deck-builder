@@ -6,6 +6,8 @@ import sys
 import tempfile
 from pathlib import Path
 
+import pymupdf
+from pptx import Presentation
 
 # PowerPoint for Mac is sandboxed: it reads and writes this folder without asking the user for access.
 OFFICE_HOME = Path.home() / "Library/Group Containers/UBF8T346G9.Office"
@@ -48,10 +50,9 @@ def to_pdf(pptx, pdf):
 
 def pdf_to_pngs(pdf, out_dir, names, width=3200):
     """Rasterize each PDF page."""
-    import pymupdf
     doc = pymupdf.open(pdf)
     paths = []
-    for page, name in zip(doc, names):
+    for page, name in zip(doc, names, strict=True):
         pix = page.get_pixmap(matrix=pymupdf.Matrix(width / page.rect.width, width / page.rect.width), alpha=False)
         path = Path(out_dir) / f"{name}.png"
         pix.save(path)
@@ -64,7 +65,6 @@ def main():
     ap.add_argument("pptx")
     ap.add_argument("--out", required=True, help="directory for the PNGs")
     args = ap.parse_args()
-    from pptx import Presentation
     names = [slide.name for slide in Presentation(args.pptx).slides]
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
