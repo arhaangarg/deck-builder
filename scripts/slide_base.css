@@ -1,0 +1,9 @@
+/* Layout plumbing every draft needs. No colors, fonts or sizes live here: those belong to each deck. */
+/* Size everything inside a slide in cqw (1cqw = 1% of the slide width) so a draft looks the same at any scale. */
+.slide {
+  position: relative;
+  width: 100%;
+  aspect-ratio: var(--slide-aspect, 16 / 9);
+  container-type: inline-size;
+  overflow: hidden;
+}
