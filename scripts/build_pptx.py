@@ -15,7 +15,11 @@ from spec_io import load_specs
 SLIDE_WIDTH = Emu(12192000)  # 13.333in, PowerPoint's own widescreen width
 EMU_PER_PT = 12700
 ALIGN = {"start": PP_ALIGN.LEFT, "center": PP_ALIGN.CENTER, "end": PP_ALIGN.RIGHT}
-DASH = {"dashed": "dash", "dotted": "sysDot"}
+# Both apps draw these two presets identically: 4 on 3 off, and 1 on 3 off, in stroke widths.
+DASH = {"dashed": "dash", "dotted": "dot"}
+# Arrowhead (width, length) presets that come closest to the standard 3.3 x 5 stroke widths arrowhead.
+# PowerPoint draws med as 3 and lg as 5. Google Slides only has three sizes, and its smallest is 3.6 x 4.9.
+ARROW_SIZE = {"powerpoint": ("med", "lg"), "gslides": ("sm", "sm")}
 # PowerPoint with exact line spacing, measured across fonts, sizes and spacings (see references/7-build.md):
 # up to 1.2 x the font size the font's descent (a touch more) sits under the baseline and the rest above it;
 # beyond that the baseline sits three quarters of the way down the line.
@@ -83,7 +87,7 @@ def add_box(slide, el):
     no_effects(shape)
 
 
-def add_line(slide, el):
+def add_line(slide, el, target):
     line = slide.shapes.add_connector(MSO_CONNECTOR.STRAIGHT, emu(el["x1"]), emu(el["y1"]), emu(el["x2"]), emu(el["y2"]))
     outline(line.line, el["stroke"])
     ln = line.line._get_or_add_ln()
@@ -91,8 +95,8 @@ def add_line(slide, el):
         if el[key]:
             end = etree.SubElement(ln, qn(tag))
             end.set("type", "triangle")
-            end.set("w", "med")
-            end.set("len", "med")
+            end.set("w", ARROW_SIZE[target][0])
+            end.set("len", ARROW_SIZE[target][1])
     no_effects(line)
 
 
@@ -176,7 +180,7 @@ def draw(slide, spec, spec_dir, slide_pt, target):
         if el["type"] in ("rect", "ellipse"):
             add_box(slide, el)
         elif el["type"] == "line":
-            add_line(slide, el)
+            add_line(slide, el, target)
         elif el["type"] == "text":
             add_text(slide, el, slide_pt, target)
         elif el["type"] == "image":

@@ -6,6 +6,11 @@
   const SVG_CONTAINERS = new Set(['svg', 'g']);
   const SVG_IGNORED = new Set(['defs', 'marker', 'title', 'desc', 'style', 'tspan']);
   const INLINE = new Set(['inline', 'contents']);
+  // The only arrowhead and dash patterns that PowerPoint and Google Slides both draw the same way, measured in
+  // both apps (see references/6-shape-vocabulary.md). All four numbers are in stroke widths.
+  const ARROW = { length: 5, width: 3.3 };
+  const DASHES = { dashed: [4, 3], dotted: [1, 3] };
+  const near = (a, b) => Math.abs(a - b) <= 0.1 * b;
 
   const paint = document.createElement('canvas').getContext('2d', { willReadFrequently: true });
 
@@ -97,7 +102,7 @@
         const colors = ['Top', 'Right', 'Bottom', 'Left'].map(s => cs[`border${s}Color`]);
         const styles = ['Top', 'Right', 'Bottom', 'Left'].map(s => cs[`border${s}Style`]);
         if (new Set(widths).size > 1 || new Set(colors).size > 1 || new Set(styles).size > 1) bad(el, 'border differs between sides (draw a line instead)');
-        if (!['solid', 'dashed', 'dotted'].includes(styles[0])) bad(el, `border style ${styles[0]}`);
+        if (styles[0] !== 'solid') bad(el, `border style ${styles[0]} (for dashes, draw an SVG shape with a standard stroke-dasharray)`);
         stroke = { ...withOpacity(color(colors[0]), opacity), width: u(widths[0]), dash: styles[0] };
       }
       const r = el.getBoundingClientRect();
@@ -241,10 +246,19 @@
       let stroke = null;
       if (cs.stroke !== 'none' && sw > 0) {
         const c = withOpacity(color(cs.stroke), opacity * strokeOpacity);
-        const dash = cs.strokeDasharray === 'none' ? 'solid' : (parseFloat(cs.strokeDasharray) <= parseFloat(cs.strokeWidth) * 1.5 ? 'dotted' : 'dashed');
-        stroke = c && { ...c, width: u(sw), dash };
+        stroke = c && { ...c, width: u(sw), dash: dashOf(el, cs) };
       }
       return { fill, stroke, scale };
+    }
+
+    /** Name the stroke's dash pattern, which must be one of the two that native apps share. */
+    function dashOf(el, cs) {
+      if (cs.strokeDasharray === 'none') return 'solid';
+      const pattern = cs.strokeDasharray.split(/[\s,]+/).map(v => parseFloat(v) / parseFloat(cs.strokeWidth));
+      const name = Object.keys(DASHES).find(k => pattern.length === 2 && near(pattern[0], DASHES[k][0]) && near(pattern[1], DASHES[k][1]));
+      if (!name) bad(el, 'dash pattern is not standard (stroke-dasharray must be 4 and 3 stroke widths for dashes, or 1 and 3 for dots)');
+      if (parseFloat(cs.strokeDashoffset)) bad(el, 'stroke-dashoffset');
+      return name || 'dashed';
     }
 
     function svgShape(el) {
@@ -269,15 +283,17 @@
           if (v === 'none') return null;
           const marker = document.querySelector(/url\(["']?(#[^"')]+)/.exec(v)?.[1] || 'none');
           if (!marker) { bad(el, 'arrow marker not found'); return null; }
-          const vb = marker.viewBox.baseVal, mw = marker.markerWidth.baseVal.value;
-          const perUnit = marker.markerUnits.baseVal === 1 ? 1 / W : stroke.width;  // 1 = userSpaceOnUse
-          const tip = (vb.width ? (vb.width - marker.refX.baseVal.value) / vb.width : 1) * mw * perUnit * (marker.markerUnits.baseVal === 1 ? Math.hypot(m.a, m.b) : 1);
+          const standard = marker.markerUnits.baseVal === 2  // 2 = strokeWidth
+            && near(marker.markerWidth.baseVal.value, ARROW.length) && near(marker.markerHeight.baseVal.value, ARROW.width)
+            && marker.refX.baseVal.value === 0 && ['auto', 'auto-start-reverse'].includes(marker.getAttribute('orient'));
+          if (!standard) bad(el, 'arrow marker is not the standard arrowhead (copy it from 6-shape-vocabulary.md)');
+          const tip = marker.markerWidth.baseVal.value * stroke.width;
           end.x = +(end.x + sign * (b.x - a.x) / len * tip).toFixed(6);
           end.y = +(end.y + sign * (b.y - a.y) / len * tip).toFixed(6);
           return 'arrow';
         };
         const arrowStart = arrow(cs.markerStart, a, -1), arrowEnd = arrow(cs.markerEnd, b, 1);
-        if (!['butt', 'round', 'square'].includes(cs.strokeLinecap)) bad(el, 'line cap');
+        if (cs.strokeLinecap !== 'butt') bad(el, `stroke-linecap ${cs.strokeLinecap} (native lines have flat ends)`);
         elements.push({ type: 'line', x1: a.x, y1: a.y, x2: b.x, y2: b.y, stroke, arrowStart, arrowEnd });
         return;
       }
