@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 150" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif" role="img" aria-label="Plan, design system, four drafts per slide, review page, hybrid rounds, build">
+  <rect width="960" height="150" rx="14" fill="#f5f5f2"/>
+  <g font-size="14" font-weight="600" fill="#1c1c1a" text-anchor="middle">
+    <g fill="#ffffff" stroke="#c9c9c2" stroke-width="1.5">
+      <rect x="24" y="36" width="132" height="54" rx="10"/>
+      <rect x="180" y="36" width="132" height="54" rx="10"/>
+      <rect x="336" y="36" width="132" height="54" rx="10"/>
+      <rect x="492" y="36" width="132" height="54" rx="10"/>
+      <rect x="648" y="36" width="132" height="54" rx="10"/>
+      <rect x="804" y="36" width="132" height="54" rx="10" fill="#1c1c1a" stroke="#1c1c1a"/>
+    </g>
+    <text x="90" y="68">1 Plan</text>
+    <text x="246" y="68">2 Design system</text>
+    <text x="402" y="68">3 Four drafts</text>
+    <text x="558" y="68">4 Review page</text>
+    <text x="714" y="68">5 Hybrid rounds</text>
+    <text x="870" y="68" fill="#ffffff">6 Build</text>
+  </g>
+  <g stroke="#8a8a84" stroke-width="1.5" fill="none">
+    <path d="M156 63h18M312 63h18M468 63h18M624 63h18M780 63h18"/>
+    <path d="M714 90v24H558V96"/>
+  </g>
+  <g fill="#8a8a84">
+    <path d="M180 63l-7-4v8zM336 63l-7-4v8zM492 63l-7-4v8zM648 63l-7-4v8zM804 63l-7-4v8zM558 90l-4 7h8z"/>
+  </g>
+  <text x="636" y="132" font-size="12" fill="#6b6b66" text-anchor="middle">until one draft is picked for every slide</text>
+</svg>
