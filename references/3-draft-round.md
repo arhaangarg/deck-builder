@@ -23,7 +23,9 @@ Neighbours, for continuity only: previous slide is "<title>", next slide is "<ti
 Read these first:
 - <skill>/references/6-shape-vocabulary.md   (what a draft may contain, and the file format)
 - <deck>/design.md and <deck>/deck.css       (this deck's design system: take every style decision from it)
-- Claude Design's slide guidance: call the Artifact tool with action "quickstart", intent "slides", and read the result.
+- Claude Design's slide guidance: call the Artifact tool with action "read" and type_url "<the Slides type link from phase 2>".
+  Read its section on designing a deck, and use it for design judgment only.
+  Ignore its file format, its element list and its pixel sizes: the shape vocabulary and deck.css replace them.
   Do not create or publish an artifact.
 <if examples exist> - <skill>/examples/<name>/ for what four distinct drafts look like
 
@@ -34,7 +36,8 @@ Name each draft in two or three words (data-name).
 Write: <deck>/drafts/<id>/r1.html
 Check: <skill>/.venv/bin/python <skill>/scripts/check.py <deck>/drafts/<id>/r1.html <--rules <deck>/rules.json if it exists>
 Fix every problem it reports and run it again until all four pass.
-Then look at each draft yourself (screenshot the file) and fix anything that looks off: crowding, misalignment, weak hierarchy.
+Then look at each draft yourself: add --shots <deck>/drafts/<id>/shots to the check command and read the pictures it saves.
+Fix anything that looks off: crowding, misalignment, weak hierarchy.
 
 Report: the four draft names with one line each on the idea, any content you could not fit, and anything you were unsure about.
 ```

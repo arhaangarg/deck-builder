@@ -12,16 +12,28 @@ def load_rules(path):
     return json.loads(Path(path).read_text()) if path else {}
 
 
+def save_shots(page, results, stem, out):
+    """Save one PNG per slide, named after the file and the draft."""
+    out.mkdir(parents=True, exist_ok=True)
+    for r in results:
+        name = f"{stem}_{r['draft'] or r['index'] + 1}.png"
+        page.locator(".slide").nth(r["index"]).screenshot(path=str(out / name))
+        print(f"     {out / name}")
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("html", nargs="+", help="draft files, each holding one or more .slide elements")
     ap.add_argument("--rules", help="rules.json with any of: minText, minPad (fractions of slide width), banned (characters)")
+    ap.add_argument("--shots", help="directory to save a picture of every slide into, so you can look at them")
     args = ap.parse_args()
     rules = load_rules(args.rules)
     failed = False
     for path in args.html:
         with open_page(path) as page:
             results = page.evaluate("rules => window.deckBuilder.check(rules).map(r => ({...r, spec: undefined}))", rules)
+            if args.shots:
+                save_shots(page, results, Path(path).stem, Path(args.shots))
         if not results:
             print(f"{path}: no .slide element found")
             failed = True

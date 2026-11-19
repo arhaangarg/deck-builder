@@ -9,13 +9,21 @@ Claude Design lives in Claude as artifact types.
 Reach it through the Artifact tool, never through a website.
 
 1. Call the Artifact tool with `action: "quickstart"` and `intent: "slides"`.
-   The result carries Claude Design's guidance for slides and lists the design systems this account can use.
-   Read all of it.
-2. If the user or their team already has a design system (the listing shows it, or they give a link), use that one.
-   Read it with `action: "read"`.
-3. Otherwise create one for this deck from the Design System type the tool lists, and follow that type's own instructions.
-   Base it on what the user told you in phase 1: brand, audience, tone, any template or reference decks.
+   The result gives the link of the Slides type and of the Design System type, and lists the design systems this account can use.
+2. Read both types: call the Artifact tool with `action: "read"` and `type_url` set to each link.
+   This returns Claude Design's own instructions without creating anything.
+   The Slides type's section on designing a deck is the guidance every drafting agent will use.
+3. If the user or their team already has a design system (the listing shows it, or they give a link), use that one.
+   Read its `project/README.md` and `project/tokens.json` with `action: "read"`, the system's `url` and a `path`.
+4. Otherwise create one for this deck.
+   This saves a private artifact to the user's account, so confirm with them first.
+   Publish with the Design System `type_url`, a `title` and no files, then follow the instructions that come back.
+   Its reference pages (`artifact-type/reference/craft.md`, `cover.md`, `format.md`) are read from the new system's `url`.
+   Base the system on what the user told you in phase 1: brand, audience, tone, any template or reference decks.
    If they gave no direction, ask for two or three references they like before inventing a look.
+
+Take from Claude Design its design judgment and the design system.
+Do not take its slide file format: this skill's drafts follow [6-shape-vocabulary.md](6-shape-vocabulary.md) instead.
 
 ## Make it usable by drafting agents
 
